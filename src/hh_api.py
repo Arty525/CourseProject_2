@@ -5,8 +5,10 @@ import requests
 import logging
 from pathlib import Path
 import os
-
+from src.vacancy import Vacancy
 from requests import TooManyRedirects
+
+from tests.test_vacancy import vacancies_list
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -86,4 +88,7 @@ class HH(HeadHunterAPI):
                 self.__vacancies.extend(vacancies)
                 self.__params['page'] += 1
         finally:
-            return self.__vacancies
+            vacancies_list = []
+            for vacancy in self.__vacancies:
+                vacancies_list.append(Vacancy(vacancy).get_vacancy())
+            return vacancies_list

@@ -25,24 +25,26 @@ class FileEditor(ABC):
 
 
 class JSONEditor(FileEditor):
-    def __init__(self, vacancies):
+    def __init__(self, vacancies = None):
         self._vacancies = vacancies
 
-    def read_file(self, file_path, params):
+    def read_file(self, file_path, params = None):
         vacancies = []
         data = json.load(open(file_path, encoding='utf-8'))
-        for vacancy in data:
-            if params['keyword'] in vacancy['name'] and (params['salary'] <= vacancy['salary'] or vacancy['salary'] is None):
+        if params is not None:
+            for vacancy in data:
+                if params['keyword'] in vacancy['name'] and (params['salary'] <= vacancy['salary'] or vacancy['salary'] is None):
+                    vacancies.append(vacancy)
+        else:
+            for vacancy in data:
                 vacancies.append(vacancy)
-
         return vacancies
 
 
     def save_to_file(self):
         with open(os.path.join(ROOT_DIR, "data", "vacancies.json"), 'w', encoding='utf-8') as f:
-            for vacancy in self._vacancies:
-                json.dump(Vacancy(vacancy).get_vacancy(), f, ensure_ascii=False, indent=4)
-            f.close()
+            json.dump(self._vacancies, f, ensure_ascii=False, indent=4)
+        f.close()
 
     def add_vacancy(self, vacancy):
         with open(os.path.join(ROOT_DIR, "data", "vacancies.json"), 'a', encoding='utf-8') as f:
