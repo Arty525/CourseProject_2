@@ -72,11 +72,18 @@ class HH(HeadHunterAPI):
             raise e
 
     def get_vacancies(self, keyword):
-        self._connect_api()
-        self.__params['text'] = keyword
-        while self.__params.get('page') != 20:
-            response = requests.get(self.__url, headers=self.__headers, params=self.__params)
-            vacancies = response.json()['items']
-            self.__vacancies.extend(vacancies)
-            self.__params['page'] += 1
-        return self.__vacancies
+        try:
+            self._connect_api()
+        except Exception as e:
+            hh_api_logger.error(e)
+            raise e
+        else:
+            self._connect_api()
+            self.__params['text'] = keyword
+            while self.__params.get('page') != 20:
+                response = requests.get(self.__url, headers=self.__headers, params=self.__params)
+                vacancies = response.json()['items']
+                self.__vacancies.extend(vacancies)
+                self.__params['page'] += 1
+        finally:
+            return self.__vacancies
