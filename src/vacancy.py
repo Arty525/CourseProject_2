@@ -1,4 +1,20 @@
-from abc import ABC, abstractmethod
+import logging
+from pathlib import Path
+import os
+from src.utils import get_currency_rates
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+vacancy_logger = logging.getLogger("vacancy")
+console_handler = logging.StreamHandler()
+console_formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d")
+console_handler.setFormatter(console_formatter)
+file_handler = logging.FileHandler(os.path.join(ROOT_DIR, "logs", "vacancy.log"), "w")
+file_formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d")
+file_handler.setFormatter(file_formatter)
+vacancy_logger.addHandler(file_handler)
+vacancy_logger.addHandler(console_handler)
+vacancy_logger.setLevel(logging.DEBUG)
 
 
 class Vacancy:
@@ -12,20 +28,38 @@ class Vacancy:
 
 
     def __lt__(self, other):
-        return self.salary < other.salary
+        if self.salary is str:
+            return True
+        elif other.salary is str:
+            return False
+        else:
+            return max(self.salary.values()) < max(other.salary.values())
 
     def __gt__(self, other):
-        return self.salary > other.salary
+        if self.salary is str:
+            return False
+        elif other.salary is str:
+            return True
+        else:
+            return max(self.salary.values()) > max(other.salary.values())
 
     def __eq__(self, other):
-        return self.salary == other.salary
+        if self.salary is str:
+            return False
+        elif other.salary is str:
+            return False
+        else:
+            return max(self.salary.values()) == max(other.salary.values())
 
 
     def __validate(self, salary):
-        if str(salary).isnumeric():
-            return str(salary)
-        else:
-            return "Зарплата не указана"
+        if salary is not None:
+            if salary['from'] is None or salary['from'] <= 0:
+                salary['from'] = 0
+            if salary['to'] is None or salary['to'] <= 0:
+                salary['to'] = 0
+            return salary
+        return "Зарплата не указана"
 
     def get_vacancy(self):
         return {'name': self.name, 'salary': self.salary, 'responsibility': self.responsibility,

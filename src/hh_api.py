@@ -85,6 +85,7 @@ class HH(HeadHunterAPI):
             while self.__params.get('page') != 20:
                 response = requests.get(self.__url, headers=self.__headers, params=self.__params)
                 vacancies = response.json()['items']
+                print(vacancies[0])
                 self.__vacancies.extend(vacancies)
                 self.__params['page'] += 1
         finally:

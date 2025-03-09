@@ -3,28 +3,44 @@ import src.vacancy as vacancy
 
 @pytest.fixture
 def vacancy_data():
-    vac: dict = {"name": "Разработчик фронтэнда React JS", "salary": None, "responsibility": "responsibility",
-               "requirement": "requirement", "url": "https://api.hh.ru/employers/6023237"}
+    vac: dict = {"name": "Разработчик фронтэнда React JS", "salary": None, "snippet": {"responsibility": "responsibility",
+               "requirement": "requirement"}, "url": "https://api.hh.ru/employers/6023237"}
     return vac
 
 @pytest.fixture
 def vacancies_list():
     vacancies_list = [
         {"name" : "name1",
-         "salary" : 15000,
-         "responsibility": "responsibility1",
-         "requirement": "requirement1",
+         "salary" : {"from": 10000, "to": 15000},
+         "snippet": {
+             "responsibility": "responsibility1",
+             "requirement": "requirement1"
+         },
          "url": "url1"},
+
         {"name" : "name2",
-         "salary" : 20000,
-         "responsibility": "responsibility2",
-         "requirement": "requirement2",
+         "salary" : {"from": None, "to": 20000},
+         "snippet": {
+             "responsibility": "responsibility2",
+             "requirement": "requirement2"
+         },
          "url": "url2"},
+
         {"name": "name3",
-         "salary": 20000,
-         "responsibility": "responsibility3",
-         "requirement": "requirement3",
-         "url": "url3"}
+         "salary": {"from": None, "to": 20000},
+         "snippet": {
+             "responsibility": "responsibility3",
+             "requirement": "requirement3"
+         },
+         "url": "url3"},
+
+        {"name": "name4",
+         "salary": {"from": 10000, "to": 15000},
+         "snippet": {
+             "responsibility": "responsibility4",
+             "requirement": "requirement4"
+         },
+         "url": "url4"}
     ]
     return vacancies_list
 
@@ -41,3 +57,4 @@ def test_vacancy_compare(vacancies_list):
     assert vacancy.Vacancy(vacancies_list[0]) < vacancy.Vacancy(vacancies_list[1])
     assert vacancy.Vacancy(vacancies_list[1]) > vacancy.Vacancy(vacancies_list[0])
     assert vacancy.Vacancy(vacancies_list[1]) == vacancy.Vacancy(vacancies_list[2])
+    assert vacancy.Vacancy(vacancies_list[0]) == vacancy.Vacancy(vacancies_list[3])
