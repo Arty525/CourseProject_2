@@ -5,12 +5,12 @@ from src.utils import get_currency_rates
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
-vacancy_logger = logging.getLogger("vacancy")
+vacancy_logger = logging.getLogger('vacancy')
 console_handler = logging.StreamHandler()
-console_formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d")
+console_formatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d')
 console_handler.setFormatter(console_formatter)
-file_handler = logging.FileHandler(os.path.join(ROOT_DIR, "logs", "vacancy.log"), "w")
-file_formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d")
+file_handler = logging.FileHandler(os.path.join(ROOT_DIR, 'logs', 'vacancy.log'), 'w')
+file_formatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d')
 file_handler.setFormatter(file_formatter)
 vacancy_logger.addHandler(file_handler)
 vacancy_logger.addHandler(console_handler)
@@ -18,8 +18,9 @@ vacancy_logger.setLevel(logging.DEBUG)
 
 
 class Vacancy:
-    __slots__ = ('name', 'responsibility', 'salary', 'requirement', 'url')
+    __slots__ = ('id', 'name', 'responsibility', 'salary', 'requirement', 'url')
     def __init__(self, vacancy: dict):
+        self.id = vacancy['id']
         self.name = vacancy['name']
         self.responsibility = vacancy['snippet']['responsibility']
         self.salary = self.__validate(vacancy['salary'])
@@ -59,8 +60,8 @@ class Vacancy:
             if salary['to'] is None or salary['to'] <= 0:
                 salary['to'] = 0
             return salary
-        return "Зарплата не указана"
+        return 'Зарплата не указана'
 
     def get_vacancy(self):
-        return {'name': self.name, 'salary': self.salary, 'responsibility': self.responsibility,
+        return {'id': self.id, 'name': self.name, 'salary': self.salary, 'responsibility': self.responsibility,
                 'requirement': self.requirement, 'url': self.url}

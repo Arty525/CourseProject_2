@@ -12,12 +12,12 @@ from tests.test_vacancy import vacancies_list
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
-hh_api_logger = logging.getLogger("hh_api")
+hh_api_logger = logging.getLogger('hh_api')
 console_handler = logging.StreamHandler()
-console_formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d")
+console_formatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d')
 console_handler.setFormatter(console_formatter)
-file_handler = logging.FileHandler(os.path.join(ROOT_DIR, "logs", "hh_api.log"), "w")
-file_formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d")
+file_handler = logging.FileHandler(os.path.join(ROOT_DIR, 'logs', 'hh_api.log'), 'w')
+file_formatter = logging.Formatter('[%(asctime)s] %(levelname)s - %(name)s - %(message)s - %(pathname)s:%(lineno)d')
 file_handler.setFormatter(file_formatter)
 hh_api_logger.addHandler(file_handler)
 hh_api_logger.addHandler(console_handler)
@@ -45,31 +45,31 @@ class HH(HeadHunterAPI):
     def _connect_api(self):
         try:
             response = requests.get(self.__base_url, headers=self.__headers)
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.info(result)
             return True
         except requests.exceptions.ConnectionError:
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise ConnectionError
         except requests.exceptions.Timeout:
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise TimeoutError
         except requests.exceptions.RequestException:
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise ConnectionError
         except requests.exceptions.HTTPError:
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise HTTPError
         except requests.exceptions.TooManyRedirects:
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise TooManyRedirects
         except Exception as e:
-            result = f"{response.status_code} {response.reason}"
+            result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise e
 
@@ -85,7 +85,6 @@ class HH(HeadHunterAPI):
             while self.__params.get('page') != 20:
                 response = requests.get(self.__url, headers=self.__headers, params=self.__params)
                 vacancies = response.json()['items']
-                print(vacancies[0])
                 self.__vacancies.extend(vacancies)
                 self.__params['page'] += 1
         finally:
