@@ -53,9 +53,6 @@ class JSONEditor(FileEditor):
         if params is not None:
             for vacancy in data:
                 currency_multiplier = 1
-
-                #file_editor_logger.debug(vacancy['salary'])
-
                 salary: bool = (params.get('salary') is not None and
                     (vacancy['salary'] == 'Зарплата не указана' or (vacancy['salary']['from'] * currency_multiplier
                     <= params['salary'] <= vacancy['salary']['to'] * currency_multiplier)))
@@ -82,7 +79,6 @@ class JSONEditor(FileEditor):
             json_data = json.load(open(self.__filename, encoding='utf-8'))
             vacancies_id = []
             for vacancy in json_data:
-                file_editor_logger.debug(vacancy)
                 vacancies_id.append(vacancy['id'])
 
             for vacancy in vacancies:
@@ -219,10 +215,34 @@ class CSVEditor(FileEditor):
         self.__filename = filename+'.csv' if filename != 'data.csv' and filename[-4:] != '.csv' else filename
 
     def read_file(self, params = None):
-        with open(self.__filename) as file:
+        vacancies = []
+        with open(self.__filename, encoding='utf-8') as file:
             reader = csv.DictReader(file)
-            for row in reader:
-                print(row['Name'], row['Age'], row['Gender'])
+            data = list(filter(None, reader))
+            if params is not None:
+                for row in data:
+                    salary = row['salary']
+                    currency_multiplier = 1
+                    if (params.get('salary') is not None and row['salary'] != 'Зарплата не указана'):
+                        salary = eval(row['salary'])
+                        if salary['currency'] != 'RUR':
+                            try:
+                                currency_multiplier = get_currency_rates(salary['currency'])
+                            except TypeError:
+                                currency_multiplier = 1
+
+                    is_salary: bool = (params.get('salary') is not None and
+                                    (salary == 'Зарплата не указана' or (
+                                                salary['from'] * currency_multiplier
+                                                <= params['salary'] <= salary['to'] * currency_multiplier)))
+                    is_keyword: bool = (params.get('keyword') is not None and (params['keyword'] in row['name']))
+
+                    if is_salary or is_keyword:
+                        vacancies.append(row)
+            else:
+                return data
+        return vacancies
+
 
     def save_to_file(self, vacancies):
         try:

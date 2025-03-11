@@ -12,21 +12,28 @@ from src.utils import get_currency_rates
 ROOT_DIR = Path(__file__).parent.resolve()
 
 if __name__ == '__main__':
-    hh_api = HH()
-    data = hh_api.get_vacancies("Разработчик")
-    json_editor = JSONEditor(os.path.join(ROOT_DIR, "data", "data.json"))
-    json_editor.save_to_file(data)
+    # hh_api = HH()
+    # data = hh_api.get_vacancies("Разработчик")
+    # json_editor = JSONEditor(os.path.join(ROOT_DIR, "data", "data.json"))
+    # json_editor.save_to_file(data)
     csv_editor = CSVEditor()
-    csv_editor.save_to_file(data)
+    # csv_editor.save_to_file(data)
+
     salary = 90000
     keyword = "Разработчик"
     params = {'keyword': keyword, 'salary': salary}
-    vacancies = json_editor.read_file(params)
+
+    # vacancies = json_editor.read_file(params)
+    # for vacancy in vacancies:
+    #     print(vacancy['id'], vacancy['name'], vacancy['salary'])
+
+    vacancies = csv_editor.read_file(params)
     for vacancy in vacancies:
         print(vacancy['id'], vacancy['name'], vacancy['salary'])
-    vacancy = Vacancy({'id': 123, 'name': 'Test vacancy', 'salary': {'from': 100, 'to': 200}, 'snippet': {'responsibility': 'test responsibility', 'requirement': 'test requirement'}, 'url': 'test url'}).get_vacancy()
-    json_editor.add_vacancy(vacancy)
-    params = {'keyword': 'Test'}
-    vacancies = json_editor.read_file(params)
-    for vacancy in vacancies:
-        print(vacancy)
+
+    # vacancy = Vacancy({'id': 123, 'name': 'Test vacancy', 'salary': {'from': 100, 'to': 200}, 'snippet': {'responsibility': 'test responsibility', 'requirement': 'test requirement'}, 'url': 'test url'}).get_vacancy()
+    # json_editor.add_vacancy(vacancy)
+    # params = {'keyword': 'Test'}
+    # vacancies = json_editor.read_file(params)
+    # for vacancy in vacancies:
+    #     print(vacancy)
