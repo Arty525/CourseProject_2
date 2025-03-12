@@ -46,7 +46,7 @@ class HH(HeadHunterAPI):
         try:
             response = requests.get(self.__base_url, headers=self.__headers)
             result = f'{response.status_code} {response.reason}'
-            hh_api_logger.info(result)
+            print('Соединение установлено')
             return True
         except requests.exceptions.ConnectionError:
             result = f'{response.status_code} {response.reason}'
@@ -68,10 +68,6 @@ class HH(HeadHunterAPI):
             result = f'{response.status_code} {response.reason}'
             hh_api_logger.error(result)
             raise TooManyRedirects
-        except Exception as e:
-            result = f'{response.status_code} {response.reason}'
-            hh_api_logger.error(result)
-            raise e
 
     def get_vacancies(self, keyword):
         try:

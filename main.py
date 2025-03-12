@@ -3,24 +3,27 @@
 #3 обработка информации из файла (добавление, фильтрация, удаление)
 
 from src.hh_api import HH
-from src.file_editor import JSONEditor, CSVEditor, ExcelEditor
 from pathlib import Path
 from src.vacancy import Vacancy
 import os.path
 import json
-from src.utils import get_currency_rates
+import src.utils as utils
+import src.commands as commands
+from tests.test_file_editor import vacancies
 
 ROOT_DIR = Path(__file__).parent.resolve()
+
+
 
 if __name__ == '__main__':
     # hh_api = HH()
     # data = hh_api.get_vacancies("Разработчик")
     # with open('data/api_data.json', 'w', encoding='utf-8') as f:
     #     json.dump(data, f, ensure_ascii=False, indent=4)
-    data = json.load(open('data/api_data.json', 'r', encoding='utf-8'))
+    # data = json.load(open('data/api_data.json', 'r', encoding='utf-8'))
     # #JSON
-    json_editor = JSONEditor()
-    json_editor.save_to_file(data)
+    # json_editor = JSONEditor()
+    # json_editor.save_to_file(data)
     #CSV
     # csv_editor = CSVEditor()
     # csv_editor.save_to_file(data)
@@ -47,10 +50,53 @@ if __name__ == '__main__':
     #     for vacancy in vacancies:
     #         f.write(f'{vacancy['id']} {vacancy['name']} {vacancy['salary']}\n')
 
-    vacancy = Vacancy({'id': '123', 'name': 'Test vacancy', 'salary': {'from': 100, 'to': 200, 'currency': 'RUR', 'gross': False}, 'snippet': {'responsibility': 'test responsibility', 'requirement': 'test requirement'}, 'url': 'test url'}).get_vacancy()
+    # vacancy = Vacancy({'id': '123', 'name': 'Test vacancy', 'salary': {'from': 100, 'to': 200, 'currency': 'RUR', 'gross': False}, 'snippet': {'responsibility': 'test responsibility', 'requirement': 'test requirement'}, 'url': 'test url'}).get_vacancy()
     #
-    json_editor.add_vacancy(vacancy)
+    # json_editor.add_vacancy(vacancy)
     #
     # csv_editor.add_vacancy(vacancy)
     #
     # excel_editor.add_vacancy(vacancy)
+
+    # top_vacancies = utils.get_top(10)
+    # for vacancy in top_vacancies:
+    #     print(vacancy)
+
+
+
+    #Основной функционал
+    print("""Выберете команду из списка:
+    1 - получить данные о вакансиях с hh.ru
+    2 - выполнить поиск по вакансиям
+    3 - получить ТОП вакансий по зарплате
+    4 - добавить новую вакансию""")
+
+    command = input('Введите номер команды: ')
+
+    if command == '1':
+        commands.get_vacancies_from_hh()
+
+    if command == '2':
+        vacancies = commands.search_vacancies()
+        if len(vacancies) > 0:
+            print(f'По вашему запросу найдено {len(vacancies)} вакансий.')
+            if input('Вывести результаты в txt файл? да/нет: ').lower() == 'да':
+                with open(os.path.join(ROOT_DIR, 'data', 'vacancies.txt'), 'w', encoding='utf-8') as file:
+                    for vacancy in vacancies:
+                        file.write(f'{vacancy}\n')
+            else:
+                print(vacancies)
+
+    if command == '3':
+        vacancies = commands.get_top()
+        if input('Вывести результаты в txt файл? да/нет: ').lower() == 'да':
+            with open(os.path.join(ROOT_DIR, 'data', f'top_{len(vacancies)}_vacancies.txt'), 'w', encoding='utf-8') as file:
+                for vacancy in vacancies:
+                    file.write(f'{vacancy}\n')
+        else:
+            print(vacancies)
+
+    if command == '4':
+        commands.add_vacancy_to_file()
+
+

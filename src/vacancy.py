@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 import os
-from src.utils import get_currency_rates
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +20,7 @@ class Vacancy:
     __slots__ = ('id', 'name', 'responsibility', 'salary', 'requirement', 'url')
     def __init__(self, vacancy: dict):
         self.id = vacancy['id']
-        self.name = vacancy['name']
+        self.name = vacancy['name'].lower()
         self.responsibility = vacancy['snippet']['responsibility']
         self.salary = self.__validate(vacancy['salary'])
         self.requirement = vacancy['snippet']['requirement']
@@ -54,10 +53,10 @@ class Vacancy:
 
 
     def __validate(self, salary):
-        if salary is not None:
-            if salary['from'] is None or salary['from'] <= 0:
+        if salary is not None and salary != 'Зарплата не указана':
+            if salary['from'] is None or int(salary['from']) <= 0:
                 salary['from'] = 0
-            if salary['to'] is None or salary['to'] <= 0:
+            if salary['to'] is None or int(salary['to']) <= 0:
                 salary['to'] = 0
             return salary
         return 'Зарплата не указана'
