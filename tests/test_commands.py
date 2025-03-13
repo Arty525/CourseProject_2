@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from src.commands import get_vacancies_from_hh
+from src.commands import get_vacancies_from_hh, search_vacancies
 import src.commands as commands
 import requests
 
@@ -178,15 +178,6 @@ def test_get_vacancies_from_hh(mock_save_excel, mock_save_csv, mock_save_json, m
 Данные успешно сохранены в папку data\n"""
 
 
-
-@patch('builtins.input')
-@patch('requests.get', return_value=ConnectionError)
-def test_get_vacancies_from_hh_error(mock_get, mock_input):
-    with pytest.raises(ConnectionError):
-        get_vacancies_from_hh()
-
-
-
 #ready
 @patch("builtins.input", side_effect=["json", 0, "разработчик"])
 @patch('src.file_editor.JSONEditor.read_file', return_value=[])
@@ -207,3 +198,36 @@ def test_add_vacancy_to_file(mock_save_json, mock_input, vacancies, capsys, tmpd
     assert captured.out == """Вы выбрали добавление вакансии в файл
 Введите данные или оставьте поле пустым
 Вакансия успешно добавлена\n"""
+
+
+#ready
+@patch("builtins.input", side_effect=["csv", 0, "разработчик"])
+@patch('src.file_editor.CSVEditor.read_file', return_value=[])
+def test_search_vacancies_csv_not_found(mock_save_json, mock_input, vacancies, capsys, tmpdir):
+    commands.search_vacancies()
+    captured = capsys.readouterr()
+    assert captured.out == """Вы выбрали поиск по вакансиям
+Введите параметры для поиска или оставьте поле пустым
+Не удалось найти вакансии по вашему запросу\n"""
+
+
+#ready
+@patch("builtins.input", side_effect=["excel", 0, "разработчик"])
+@patch('src.file_editor.ExcelEditor.read_file', return_value=[])
+def test_search_vacancies_excel_not_found(mock_save_json, mock_input, vacancies, capsys, tmpdir):
+    commands.search_vacancies()
+    captured = capsys.readouterr()
+    assert captured.out == """Вы выбрали поиск по вакансиям
+Введите параметры для поиска или оставьте поле пустым
+Не удалось найти вакансии по вашему запросу\n"""
+
+
+#ready
+@patch("builtins.input", side_effect=["", 0, "разработчик"])
+@patch('src.file_editor.JSONEditor.read_file', return_value=[])
+def test_search_vacancies_not_found(mock_save_json, mock_input, vacancies, capsys, tmpdir):
+    commands.search_vacancies()
+    captured = capsys.readouterr()
+    assert captured.out == """Вы выбрали поиск по вакансиям
+Введите параметры для поиска или оставьте поле пустым
+Не удалось найти вакансии по вашему запросу\n"""

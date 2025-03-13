@@ -63,9 +63,9 @@ class HH(HeadHunterAPI):
     def get_vacancies(self, keyword):
         try:
             self._connect_api()
-        except Exception as e:
-            hh_api_logger.error(e)
-            raise e
+        except requests.exceptions.ConnectionError as connection_err:
+            hh_api_logger.error('Connection Error')
+            raise requests.exceptions.ConnectionError
         else:
             self.__params['text'] = keyword
             while self.__params.get('page') != 20:
