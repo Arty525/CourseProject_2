@@ -5,7 +5,7 @@ import requests
 import src.utils as utils
 
 
-#ready
+# ready
 @patch("requests.request")
 def test_get_currency_rates(mock_get):
     mock_get.return_value.json.return_value = {
