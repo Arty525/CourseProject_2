@@ -55,5 +55,4 @@ def get_currency_rates(currency: str) -> list:
     result = response.json().get('data')
     result = float(result[currency])
 
-    #utils_logger.info('Функция выполнена успешно')
     return int(result)

@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 import os
 from src.vacancy import Vacancy
-from requests import TooManyRedirects
+from requests import TooManyRedirects, RequestException
 
 from tests.test_vacancy import vacancies_list
 
@@ -36,7 +36,7 @@ class HeadHunterAPI(ABC):
 
 class HH(HeadHunterAPI):
     def __init__(self):
-        self.__url = 'https://api.hh.ru/vacancies'
+        self.__url = 'https://api.hh.rru/vacancies'
         self.__base_url = 'https://api.hh.ru/'
         self.__headers = {'User-Agent': 'HH-User-Agent'}
         self.__params = {'text': '', 'page': 0, 'per_page': 100}
@@ -45,29 +45,20 @@ class HH(HeadHunterAPI):
     def _connect_api(self):
         try:
             response = requests.get(self.__base_url, headers=self.__headers)
-            result = f'{response.status_code} {response.reason}'
             print('Соединение установлено')
             return True
-        except requests.exceptions.ConnectionError:
-            result = f'{response.status_code} {response.reason}'
-            hh_api_logger.error(result)
-            raise ConnectionError
-        except requests.exceptions.Timeout:
-            result = f'{response.status_code} {response.reason}'
-            hh_api_logger.error(result)
-            raise TimeoutError
-        except requests.exceptions.RequestException:
-            result = f'{response.status_code} {response.reason}'
-            hh_api_logger.error(result)
-            raise ConnectionError
-        except requests.exceptions.HTTPError:
-            result = f'{response.status_code} {response.reason}'
-            hh_api_logger.error(result)
-            raise HTTPError
-        except requests.exceptions.TooManyRedirects:
-            result = f'{response.status_code} {response.reason}'
-            hh_api_logger.error(result)
-            raise TooManyRedirects
+        except requests.exceptions.ConnectionError as conncection_err:
+            hh_api_logger.error('Connection Error')
+            raise conncection_err
+        except requests.exceptions.Timeout as timeout:
+            hh_api_logger.error('Timeout')
+            raise timeout
+        except requests.exceptions.HTTPError as http_err:
+            hh_api_logger.error('HTTP error occurred')
+            raise http_err
+        except requests.exceptions.TooManyRedirects as too_many_redirects:
+            hh_api_logger.error('Too Many Redirects')
+            raise too_many_redirects
 
     def get_vacancies(self, keyword):
         try:
@@ -76,7 +67,6 @@ class HH(HeadHunterAPI):
             hh_api_logger.error(e)
             raise e
         else:
-            self._connect_api()
             self.__params['text'] = keyword
             while self.__params.get('page') != 20:
                 response = requests.get(self.__url, headers=self.__headers, params=self.__params)

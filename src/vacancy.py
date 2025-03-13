@@ -53,6 +53,8 @@ class Vacancy:
 
 
     def __validate(self, salary):
+        if salary == '':
+            salary = 'Зарплата не указана'
         if salary is not None and salary != 'Зарплата не указана':
             if salary['from'] is None or int(salary['from']) <= 0:
                 salary['from'] = 0

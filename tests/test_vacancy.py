@@ -3,7 +3,7 @@ import src.vacancy as vacancy
 
 @pytest.fixture
 def vacancy_data():
-    vac: dict = {'id': 123, 'name': 'Разработчик фронтэнда React JS', 'salary': None, 'snippet': {'responsibility': 'responsibility',
+    vac: dict = {'id': 123, 'name': 'Разработчик фронтэнда React JS', 'salary': '', 'snippet': {'responsibility': 'responsibility',
                'requirement': 'requirement'}, 'url': 'https://api.hh.ru/employers/6023237'}
     return vac
 
@@ -49,6 +49,8 @@ def vacancies_list():
     ]
     return vacancies_list
 
+
+#ready
 def test_vacancy_validate(vacancy_data):
     vac = vacancy.Vacancy(vacancy_data)
     assert vac.id == 123
@@ -56,9 +58,10 @@ def test_vacancy_validate(vacancy_data):
     assert vac.url == 'https://api.hh.ru/employers/6023237'
     assert vac.responsibility == 'responsibility'
     assert vac.requirement == 'requirement'
-    assert vac.name == 'Разработчик фронтэнда React JS'
+    assert vac.name == 'разработчик фронтэнда react js'
 
 
+#ready
 def test_vacancy_compare(vacancies_list):
     assert vacancy.Vacancy(vacancies_list[0]) < vacancy.Vacancy(vacancies_list[1])
     assert vacancy.Vacancy(vacancies_list[1]) > vacancy.Vacancy(vacancies_list[0])

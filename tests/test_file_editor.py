@@ -1,13 +1,9 @@
-from idlelib.iomenu import encoding
-
 import pytest
 from src.file_editor import JSONEditor, ExcelEditor, CSVEditor
 from unittest.mock import Mock, patch, mock_open
 import json
 import pandas as pd
 import csv
-
-from src.vacancy import Vacancy
 
 
 @pytest.fixture
