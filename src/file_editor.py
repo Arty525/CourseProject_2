@@ -41,7 +41,7 @@ class FileEditor(ABC):
 
 class JSONEditor(FileEditor):
     def __init__(self, filename = f'{ROOT_DIR}\\data\\json_data.json'):
-        self.__filename = filename+'.json' if filename != 'data.json' and filename[-5:] != '.json' else filename
+        self.__filename = filename+'.json' if filename != 'json_data.json' and filename[-5:] != '.json' else filename
 
 
     def read_file(self, params = None):
@@ -52,12 +52,7 @@ class JSONEditor(FileEditor):
             if params is not None:
                 for vacancy in data:
                     currency_multiplier = 1
-                    is_salary: bool = (params.get('salary') is not None and
-                        (vacancy['salary'] == 'Зарплата не указана' or (vacancy['salary']['from'] * currency_multiplier
-                        <= params['salary'] <= vacancy['salary']['to'] * currency_multiplier)))
-                    is_keyword: bool = (params.get('keyword') is not None and (params['keyword'] in vacancy['name']))
-
-                    if (params.get('salary') is not None and
+                    if (params.get('salary') != '' and
                             vacancy.get('salary') != 'Зарплата не указана' and
                             vacancy.get('salary').get('currency') != 'RUR'):
                         try:
@@ -65,11 +60,16 @@ class JSONEditor(FileEditor):
                         except TypeError:
                             currency_multiplier = 1
 
-                    if params.get('keyword') is None and is_salary:
-                        vacancies.append(vacancy)
-                    elif params.get('salary') is None and is_keyword:
-                        vacancies.append(vacancy)
-                    elif is_salary and is_keyword:
+                    is_salary: bool = True
+                    if params['salary'] == '':
+                        is_salary = True
+                    else:
+                        is_salary: bool = (vacancy['salary'] == 'Зарплата не указана' or (vacancy['salary']['from']
+                            * currency_multiplier <= params['salary'] <= vacancy['salary']['to']
+                            * currency_multiplier))
+                    is_keyword: bool = (params.get('keyword') == '' or (params['keyword'].lower() in vacancy['name'].lower()))
+
+                    if is_salary and is_keyword:
                         vacancies.append(vacancy)
 
             else:
@@ -82,10 +82,11 @@ class JSONEditor(FileEditor):
 
     def save_to_file(self, vacancies):
         try:
-            json_data = json.load(open(self.__filename, encoding='utf-8'))
             vacancies_id = []
-            for vacancy in json_data:
-                vacancies_id.append(vacancy['id'])
+            with open(self.__filename, 'r', encoding='utf-8') as f:
+                json_data = json.load(f)
+                for vacancy in json_data:
+                    vacancies_id.append(vacancy['id'])
 
             for vacancy in vacancies:
                 if vacancy['id'] not in vacancies_id:
@@ -122,7 +123,8 @@ class JSONEditor(FileEditor):
 
 
     def delete_vacancy(self):
-        open(os.path.join(ROOT_DIR, 'data', self.__filename), 'w', encoding='utf-8').close()
+        with open(os.path.join(ROOT_DIR, 'data', self.__filename), 'w', encoding='utf-8') as f:
+            json.dump([], f, ensure_ascii=False, indent=4)
 
 
 class ExcelEditor(FileEditor):
@@ -138,24 +140,24 @@ class ExcelEditor(FileEditor):
             if params is not None:
                 for vacancy in data:
                     currency_multiplier = 1
-                    is_salary: bool = (params.get('salary') is not None and
-                        (vacancy['salary'] == 'Зарплата не указана' or (eval(vacancy['salary'])['from'] * currency_multiplier
-                        <= params['salary'] <= eval(vacancy['salary'])['to'] * currency_multiplier)))
-                    is_keyword: bool = (params.get('keyword') is not None and (params['keyword'] in vacancy['name']))
-
-                    if (params.get('salary') is not None and
+                    if (params.get('salary') != '' and
                             vacancy.get('salary') != 'Зарплата не указана' and
-                            eval(vacancy.get('salary')).get('currency') != 'RUR'):
+                            vacancy.get('salary').get('currency') != 'RUR'):
                         try:
-                            currency_multiplier = get_currency_rates(eval(vacancy['salary'])['currency'])
+                            currency_multiplier = get_currency_rates(vacancy['salary']['currency'])
                         except TypeError:
                             currency_multiplier = 1
 
-                    if params.get('keyword') is None and is_salary:
-                        vacancies.append(vacancy)
-                    elif params.get('salary') is None and is_keyword:
-                        vacancies.append(vacancy)
-                    elif is_salary and is_keyword:
+                    is_salary: bool = True
+                    if params['salary'] == '':
+                        is_salary = True
+                    else:
+                        is_salary: bool = (vacancy['salary'] == 'Зарплата не указана' or (vacancy['salary']['from']
+                            * currency_multiplier <= params['salary'] <= vacancy['salary']['to']
+                            * currency_multiplier))
+                    is_keyword: bool = (params.get('keyword') == '' or (params['keyword'].lower() in vacancy['name'].lower()))
+
+                    if is_salary and is_keyword:
                         vacancies.append(vacancy)
             else:
                 for vacancy in data:
@@ -207,7 +209,7 @@ class ExcelEditor(FileEditor):
 
 class CSVEditor(FileEditor):
     def __init__(self, filename = f'{ROOT_DIR}\\data\\csv_data.csv'):
-        self.__filename = filename+'.csv' if filename != 'data.csv' and filename[-4:] != '.csv' else filename
+        self.__filename = filename+'.csv' if filename != 'csv_data.csv' and filename[-4:] != '.csv' else filename
 
     def read_file(self, params = None):
         try:
@@ -220,25 +222,27 @@ class CSVEditor(FileEditor):
                     for row in data:
                         salary = row['salary']
                         currency_multiplier = 1
-                        if (params.get('salary') is not None and row['salary'] != 'Зарплата не указана'):
-                            salary = eval(row['salary'])
-                            if salary['currency'] != 'RUR':
-                                try:
-                                    currency_multiplier = get_currency_rates(salary['currency'])
-                                except TypeError:
-                                    currency_multiplier = 1
+                        if (params.get('salary') != '' and
+                                row.get('salary') != 'Зарплата не указана' and
+                                row.get('salary').get('currency') != 'RUR'):
+                            try:
+                                currency_multiplier = get_currency_rates(row['salary']['currency'])
+                            except TypeError:
+                                currency_multiplier = 1
 
-                        is_salary: bool = (params.get('salary') is not None and
-                                        (salary == 'Зарплата не указана' or (
-                                                    salary['from'] * currency_multiplier
-                                                    <= params['salary'] <= salary['to'] * currency_multiplier)))
-                        is_keyword: bool = (params.get('keyword') is not None and (params['keyword'] in row['name']))
+                        is_salary: bool = True
+                        if params['salary'] == '':
+                            is_salary = True
+                        else:
+                            is_salary: bool = (row['salary'] == 'Зарплата не указана' or (row['salary']['from']
+                                                                                              * currency_multiplier <=
+                                                                                              params['salary'] <=
+                                                                                              row['salary']['to']
+                                                                                              * currency_multiplier))
+                        is_keyword: bool = (params.get('keyword') == '' or (
+                                    params['keyword'].lower() in row['name'].lower()))
 
-                        if params.get('keyword') is None and is_salary:
-                            vacancies.append(row)
-                        elif params.get('salary') is None and is_keyword:
-                            vacancies.append(row)
-                        elif is_salary and is_keyword:
+                        if is_salary and is_keyword:
                             vacancies.append(row)
                 else:
                     return data
@@ -282,11 +286,8 @@ class CSVEditor(FileEditor):
                 reader = csv.DictReader(csv_file)
                 for row in reader:
                     vacancies_id.append(row['id'])
-            file_editor_logger.debug(vacancies_id)
             if vacancy['id'] not in vacancies_id:
-                file_editor_logger.debug(vacancy['id'])
                 with open(self.__filename, 'a', encoding='utf-8', newline='') as file:
-                    file_editor_logger.debug('good')
                     fieldnames = ['id', 'name', 'salary', 'responsibility', 'requirement', 'url']
                     writer = csv.DictWriter(file, fieldnames=fieldnames)
                     writer.writerow(vacancy)
