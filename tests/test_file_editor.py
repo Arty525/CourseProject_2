@@ -51,6 +51,13 @@ def test_read_json_file(mock_open, mock_json_load, vacancies):
 
 
 #ready
+def test_read_json_file_error(mock_json_load, vacancies):
+    json_editor = JSONEditor('noname.json')
+    with pytest.raises(FileNotFoundError):
+        json_editor.read_file({})
+
+
+#ready
 def test_save_to_json_file(vacancies, tmpdir):
     file = tmpdir.join('output.json')
     json_editor = JSONEditor(str(file))
@@ -101,6 +108,13 @@ def test_read_excel_file(mock_open, mock_read_excel, vacancies):
 
 
 #ready
+def test_read_json_file_error(vacancies):
+    excel_editor = ExcelEditor('noname.xlsx')
+    with pytest.raises(FileNotFoundError):
+        excel_editor.read_file({})
+
+
+#ready
 def test_save_to_excel_file(vacancies, tmpdir):
     file = tmpdir.join('output.xlsx')
     excel_editor = ExcelEditor(str(file))
@@ -148,6 +162,12 @@ def test_read_csv_file(vacancies, tmpdir):
     assert csv_data[2]['name'] == vacancies[2]['name']
     assert csv_data[0] == vacancies[0]
 
+
+#ready
+def test_read_csv_file_error():
+    csv_editor = CSVEditor('noname.csv')
+    with pytest.raises(FileNotFoundError):
+        csv_editor.read_file({})
 
 #ready
 def test_save_to_csv_file(vacancies, tmpdir):

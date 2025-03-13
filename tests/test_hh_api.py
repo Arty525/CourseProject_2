@@ -1,8 +1,7 @@
 import requests
 import src.hh_api as hh_api
 import pytest
-from unittest.mock import Mock, patch, mock_open
-import json
+from unittest.mock import patch
 
 
 #ready

@@ -214,7 +214,7 @@ class CSVEditor(FileEditor):
     def read_file(self, params = None):
         try:
             vacancies = []
-            with open(self.__filename, encoding='utf-8') as file:
+            with open(self.__filename, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 print('Выполняется поиск по CSV-файлу')
                 data = list(filter(None, reader))

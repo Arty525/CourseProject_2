@@ -23,6 +23,7 @@ def get_top() -> list:
     print('Вы выбрали получение ТОП-вакансий по зарплате')
     number = int(input('Введите количество вакансий в выборке: '))
     top_vacancies = []
+    print(f'Выполняется выборка из {number} вакансий')
     try:
         json_editor = JSONEditor()
         vacancies = json_editor.read_file()
@@ -91,7 +92,7 @@ def get_vacancies_from_hh():
                 print(f'Не удалось сохранить данные в EXCEL-файл. Возникла ошибка: {e}')
                 raise e
     print('Данные успешно сохранены в папку data')
-    return data
+
 
 def search_vacancies()->list:
     print('Вы выбрали поиск по вакансиям')
@@ -130,7 +131,6 @@ def search_vacancies()->list:
 def add_vacancy_to_file():
     print('Вы выбрали добавление вакансии в файл')
     print('Введите данные или оставьте поле пустым')
-    ('id', 'name', 'responsibility', 'salary', 'requirement', 'url')
     name = input('Введите название вакансии: ')
     responsibility = input('Введите описание вакансии: ')
     requirement = input('Введите требуемые навыки: ')
