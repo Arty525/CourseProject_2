@@ -1,13 +1,8 @@
-from importlib.metadata import pass_none
-
-import requests
 import pytest
-from unittest.mock import Mock, patch, mock_open
-
+from unittest.mock import patch
 from src.commands import get_vacancies_from_hh
-from src.file_editor import JSONEditor, ExcelEditor, CSVEditor
 import src.commands as commands
-import tests.test_file_editor as test_file_editor
+import requests
 
 
 @pytest.fixture
@@ -155,6 +150,15 @@ def test_get_top(mock_load, mock_open, mock_input, value, expected):
 
 #ready
 @patch('builtins.input')
+@patch('builtins.open', side_effect=FileNotFoundError)
+def test_get_top_file_error(mock_open, mock_input):
+    mock_input.return_value = 5
+    with pytest.raises(FileNotFoundError):
+        commands.get_top()
+
+
+#ready
+@patch('builtins.input')
 @patch('builtins.open')
 @patch('src.file_editor.JSONEditor.save_to_file')
 @patch('src.file_editor.CSVEditor.save_to_file')
@@ -172,6 +176,15 @@ def test_get_vacancies_from_hh(mock_save_excel, mock_save_csv, mock_save_json, m
 Данные сохранены в CSV-файл
 Данные сохранены в EXCEL-файл
 Данные успешно сохранены в папку data\n"""
+
+
+
+@patch('builtins.input')
+@patch('requests.get', return_value=ConnectionError)
+def test_get_vacancies_from_hh_error(mock_get, mock_input):
+    with pytest.raises(ConnectionError):
+        get_vacancies_from_hh()
+
 
 
 #ready
