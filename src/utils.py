@@ -34,7 +34,6 @@ def get_currency_rates(currency: str) -> int:
     """
 
     currency += "RUB"
-    # utils_logger.debug(currency)
     url = f"https://currate.ru/api/?get=rates&pairs={currency}&key={CURRENCY_RATE_API_KEY}"
 
     payload = {}

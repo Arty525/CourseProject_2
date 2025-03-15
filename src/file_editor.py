@@ -83,7 +83,6 @@ class JSONEditor(FileEditor):
         vacancies = []
         try:
             data = json.load(open(self.__filename, encoding="utf-8"))
-            file_editor_logger.debug(data[0])
             print("Выполняется поиск по JSON-файлу")
             if params is not None:
                 for vacancy in data:
@@ -246,7 +245,6 @@ class ExcelEditor(FileEditor):
             raise FileNotFoundError("Файл не найден")
 
     def save_to_file(self, vacancies: list):
-        file_editor_logger.debug(type(vacancies[0]))
         try:
             excel_data = pd.read_excel(self.__filename)
             vacancies_id = excel_data["id"]
@@ -429,8 +427,7 @@ class CSVEditor(FileEditor):
                     ]
                     writer = csv.DictWriter(file, fieldnames=fieldnames)
                     writer.writerow(vacancy.get_as_dict())
-        except Exception as e:
-            file_editor_logger.debug(e)
+        except Exception:
             with open(self.__filename, "w", encoding="utf-8", newline="") as file:
                 fieldnames = [
                     "id",

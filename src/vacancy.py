@@ -57,8 +57,6 @@ class Vacancy:
                 return self.salary["to"] > other.salary["to"]
 
     def __eq__(self, other: Any) -> bool:
-        vacancy_logger.debug(self.salary)
-        vacancy_logger.debug(other.salary)
         if isinstance(other, Vacancy):
             if type(self.salary) is not str and type(other.salary) is not str:
                 return self.salary["to"] == other.salary["to"]
