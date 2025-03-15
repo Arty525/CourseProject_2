@@ -440,7 +440,6 @@ class CSVEditor(FileEditor):
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 writer.writeheader()
                 writer.writerow(vacancy.get_as_dict())
-
     def delete_vacancy(self):
         with open(self.__filename, "w", encoding="utf-8", newline="") as file:
             fieldnames = [

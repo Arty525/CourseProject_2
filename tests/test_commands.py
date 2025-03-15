@@ -43,28 +43,6 @@ def vacancies():
     [
         (
             [
-                # Vacancy("117961997","Python разработчик","Разработка бэк-энда",
-                #     "Зарплата не указана","Python, Git, Docker","https://api.hh.ru/vacancies/123",),
-                # #2
-                # Vacancy("15213251", "Разработчик C++", "Разработка приложений под Windows",
-                #             {"currency": "RUR", "from": 150000, "to": 170000}, "Знание C++",
-                #         "https://api.hh.ru/vacancies/321"),
-                # #1
-                # Vacancy("14634623", "Team-lead", "Руководство командой разработчиков на Python",
-                #         {"currency": "RUR", "from": 250000, "to": 300000}, "Умение работать в команде",
-                #         "https://api.hh.ru/vacancies/6612"),
-                # #3
-                # Vacancy("572423263", "Уборщица", "Уборка офиса",
-                #         {"currency": "RUR", "from": 25000, "to": 30000}, "Умение работать со шваброй",
-                #         "https://api.hh.ru/vacancies/6612"),
-                # #4
-                # Vacancy("4527245747", "Уборщица в офис", "Уборка офиса",
-                #         {"currency": "RUR", "from": 15000, "to": 30000}, "Умение работать со шваброй",
-                #         "https://api.hh.ru/vacancies/6612"),
-                # #5
-                # Vacancy("564248225333", "Уборщица на завод", "Уборка цеха",
-                #         {"currency": "RUR", "from": 5000, "to": 10000}, "Умение работать со шваброй",
-                #         "https://api.hh.ru/vacancies/6612")
                 {
                     "id": "117961997",
                     "name": "Python разработчик",
@@ -249,8 +227,10 @@ def test_search_vacancies(mock_save_json, mock_input, vacancies, capsys, tmpdir)
         "json",
     ],
 )
+@patch("src.file_editor.CSVEditor.add_vacancy")
+@patch("src.file_editor.ExcelEditor.add_vacancy")
 @patch("src.file_editor.JSONEditor.add_vacancy")
-def test_add_vacancy_to_file(mock_save_json, mock_input, vacancies, capsys, tmpdir):
+def test_add_vacancy_to_file(mock_save_json, mock_save_excel, mock_save_csv, mock_input, vacancies, capsys, tmpdir):
     commands.add_vacancy_to_file()
     captured = capsys.readouterr()
     assert (
