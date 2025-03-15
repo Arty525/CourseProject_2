@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 import requests
+
 import src.hh_api as hh_api
 
 
@@ -141,8 +142,8 @@ def test_get_vacancies(mock_get, request_result):
     mock_get.return_value.json.return_value = request_result
     vacancies = hh_api.HH().get_vacancies("")
     vacancy = vacancies[0]
-    assert vacancy["id"] == "93353083"
-    assert vacancy["name"] == "тестировщик комфорта квартир"
-    assert vacancy["salary"]["from"] == 350000
-    assert vacancy["salary"]["to"] == 450000
-    assert vacancy["salary"]["currency"] == "RUR"
+    assert vacancy.id == "93353083"
+    assert vacancy.name == "тестировщик комфорта квартир"
+    assert vacancy.salary["from"] == 350000
+    assert vacancy.salary["to"] == 450000
+    assert vacancy.salary["currency"] == "RUR"

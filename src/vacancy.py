@@ -28,37 +28,56 @@ class Vacancy:
 
     __slots__ = ("id", "name", "responsibility", "salary", "requirement", "url")
 
-    def __init__(self, vacancy: dict):
-        self.id = vacancy["id"]
-        self.name = vacancy["name"].lower()
-        self.responsibility = vacancy["snippet"]["responsibility"]
-        self.salary = self.__validate(vacancy["salary"])
-        self.requirement = vacancy["snippet"]["requirement"]
-        self.url = vacancy["url"]
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        responsibility: str,
+        salary: Any,
+        requirement: str,
+        url: str,
+    ):
+        self.id = id
+        self.name = name.lower()
+        self.responsibility = responsibility
+        self.salary = self.__validate(salary)
+        self.requirement = requirement
+        self.url = url
 
     def __lt__(self, other: Any) -> bool:
-        if self.salary is str:
-            return True
-        elif other.salary is str:
-            return False
-        else:
-            return max(self.salary.values()) < max(other.salary.values())
+        if isinstance(other, Vacancy):
+            if type(self.salary) is not str and type(other.salary) is not str:
+                return self.salary["to"] < other.salary["to"]
+            else:
+                return False
 
     def __gt__(self, other: Any) -> bool:
-        if self.salary is str:
-            return False
-        elif other.salary is str:
-            return True
-        else:
-            return max(self.salary.values()) > max(other.salary.values())
+        if isinstance(other, Vacancy):
+            if type(self.salary) is not str and type(other.salary) is not str:
+                return self.salary["to"] > other.salary["to"]
 
     def __eq__(self, other: Any) -> bool:
-        if self.salary is str:
-            return False
-        elif other.salary is str:
-            return False
+        vacancy_logger.debug(self.salary)
+        vacancy_logger.debug(other.salary)
+        if isinstance(other, Vacancy):
+            if type(self.salary) is not str and type(other.salary) is not str:
+                return self.salary["to"] == other.salary["to"]
+            else:
+                return False
+
+    def __str__(self):
+        salary = ""
+        if self.salary == "Зарплата не указана":
+            salary = self.salary
         else:
-            return max(self.salary.values()) == max(other.salary.values())
+            if self.salary.get("from") is not None:
+                salary += f'от {self.salary["from"]} '
+            if self.salary.get("to") is not None:
+                salary += f'до {self.salary["to"]}'
+        return (
+            f"{self.name}\nЗарплата: {salary}\nОписание вакансии: {self.responsibility}\n"
+            f"Требования: {self.requirement}\nURL: {self.url}\n{'-'*50}"
+        )
 
     def __validate(self, salary: Any) -> Any:
         """
@@ -67,6 +86,8 @@ class Vacancy:
         if salary == "":
             salary = "Зарплата не указана"
         if salary is not None and salary != "Зарплата не указана":
+            if type(salary) is str:
+                salary = eval(salary)
             if salary["from"] is None or int(salary["from"]) <= 0:
                 salary["from"] = 0
             if salary["to"] is None or int(salary["to"]) <= 0:
@@ -74,7 +95,7 @@ class Vacancy:
             return salary
         return "Зарплата не указана"
 
-    def get_vacancy(self) -> dict:
+    def get_as_dict(self) -> dict:
         """
         Функция возвращает вакансию в виде словаря
         """
@@ -86,3 +107,21 @@ class Vacancy:
             "requirement": self.requirement,
             "url": self.url,
         }
+
+
+def cast_vacancies_from_dict(vacancies: list) -> list:
+    """
+    Функция принимает список вакансий в виде словарей и возвращает список вакансий в виде объектов класса Vacancy
+    """
+    for i in range(len(vacancies)):
+        if vacancies[i] is str:
+            vacancies[i] = eval(vacancies[i])
+        vacancies[i] = Vacancy(
+            vacancies[i]["id"],
+            vacancies[i]["name"],
+            vacancies[i]["responsibility"],
+            vacancies[i]["salary"],
+            vacancies[i]["requirement"],
+            vacancies[i]["url"],
+        )
+    return vacancies

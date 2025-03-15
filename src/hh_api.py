@@ -2,7 +2,9 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
+
 import requests
+
 from src.vacancy import Vacancy
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -50,7 +52,7 @@ class HH(HeadHunterAPI):
     """
 
     def __init__(self):
-        self.__url = "https://api.hh.rru/vacancies"
+        self.__url = "https://api.hh.ru/vacancies"
         self.__base_url = "https://api.hh.ru/"
         self.__headers = {"User-Agent": "HH-User-Agent"}
         self.__params = {"text": "", "page": 0, "per_page": 100}
@@ -74,23 +76,40 @@ class HH(HeadHunterAPI):
             hh_api_logger.error("Too Many Redirects")
             raise too_many_redirects
 
+    def cast_vacancies(self) -> list:
+        """
+        Функция создает список из объектов класса Vacancy и возвращает его
+        """
+        vacancies_list = []
+        for vacancy in self.__vacancies:
+            # ("id", "name", "responsibility", "salary", "requirement", "url")
+            vacancies_list.append(
+                Vacancy(
+                    vacancy["id"],
+                    vacancy["name"],
+                    vacancy["snippet"]["responsibility"],
+                    vacancy["salary"],
+                    vacancy["snippet"]["requirement"],
+                    vacancy["url"],
+                )
+            )
+        return vacancies_list
+
     def get_vacancies(self, keyword: str) -> list:
+        """
+        Функция получает список вакансий с hh.ru и возвращает список объектов класса Vacancy
+        """
         try:
             self._connect_api()
         except requests.exceptions.ConnectionError:
             hh_api_logger.error("Connection Error")
-            raise requests.exceptions.ConnectionError
-        else:
-            self.__params["text"] = keyword
-            while self.__params.get("page") != 20:
-                response = requests.get(
-                    self.__url, headers=self.__headers, params=self.__params
-                )
-                vacancies = response.json()["items"]
-                self.__vacancies.extend(vacancies)
-                self.__params["page"] += 1
-        finally:
-            vacancies_list = []
-            for vacancy in self.__vacancies:
-                vacancies_list.append(Vacancy(vacancy).get_vacancy())
-            return vacancies_list
+            return []
+        self.__params["text"] = keyword
+        while self.__params.get("page") != 20:
+            response = requests.get(
+                self.__url, headers=self.__headers, params=self.__params
+            )
+            vacancies = response.json()["items"]
+            self.__vacancies.extend(vacancies)
+            self.__params["page"] += 1
+        return self.cast_vacancies()

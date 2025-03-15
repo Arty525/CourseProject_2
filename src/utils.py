@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
 
