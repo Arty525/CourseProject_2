@@ -78,3 +78,15 @@ def test_vacancy_compare(vacancies_list):
     assert vacancies_list[1] > vacancies_list[2]
     assert vacancies_list[2] < vacancies_list[1]
     assert vacancies_list[2] == vacancies_list[3]
+
+
+def test_vacancy_str(vacancies_list, capsys):
+    print(vacancies_list[0])
+    captured = capsys.readouterr()
+    assert captured.out == '''python разработчик
+Зарплата: Зарплата не указана
+Описание вакансии: Разработка бэк-энда
+Требования: Python, Git, Docker
+URL: https://api.hh.ru/vacancies/123
+--------------------------------------------------
+'''
