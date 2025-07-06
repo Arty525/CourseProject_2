@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "courseproject-2"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+flake8 = "^7.1.2"
+black = "^25.1.0"
+mypy = "^1.15.0"
+isort = "^6.0.1"
+pytest = "^8.3.5"
+pytest-cov = "^6.0.0"
+requests = "^2.32.3"
+dotenv = "^0.9.9"
+pandas = "^2.2.3"
+openpyxl = "^3.1.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
